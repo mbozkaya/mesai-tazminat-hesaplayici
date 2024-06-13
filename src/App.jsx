@@ -6,7 +6,7 @@ import DaysOfWeekPicker from './components/daysofweek';
 import { addDays } from 'date-fns';
 import querySalaryByDate from './utils/querySalary';
 import SalaryList from './components/salaryList';
-import { calculateAnnualLeavePay, calculateHolidayPay, calculateSeverancePay, getAnnualLeaveDaysCount } from './utils/annualLeave';
+import { calculateAnnualLeavePay, calculateHolidayPay, calculateSeverancePay } from './utils/annualLeave';
 import Ubgt from './components/ubgt';
 import useApp from './hooks/useApp';
 import SeverancePay from './components/severancePay';
@@ -119,149 +119,161 @@ function App() {
   }, [includedSeverancePay, startDate, endDate, salaries, querySalaryByDate,])
 
   return (
-    <div className="min-h-screen container mx-auto grid grid-cols-12 md:divide-x md:divide-gray-500">
-      <div className="col-span-full md:col-span-9 grid grid-cols-12 max-h-screen overflow-y-auto p-2">
-        {/* <h6 className="text-2xl font-bold text-center col-span-full">Ek Mesai Hesaplama</h6> */}
-        <div className="col-span-full">
-          <div className="flex justify-center items-center">
-            <DateRangePicker
-              startDate={startDate}
-              endDate={endDate}
-              onStartDateChange={handleStartDateChange}
-              onEndDateChange={handleEndDateChange}
-              disabled={false}
-            />
-          </div>
-          <div className="mt-2 flex justify-center items-center">
-            <TimeRangePicker
-              startTime={startTime}
-              endTime={endTime}
-              onStartTimeChange={handleStartTimeChange}
-              onEndTimeChange={handleEndTimeChange}
-              disabled={false}
-            />
-          </div>
-          <div className="mt-2">
-            <DaysOfWeekPicker
-              selectedDays={selectedDays}
-              onDayChange={handleDayChange}
-              defaultWorkingTime={workingTime}
-              defaultEndTime={endTime}
-              defaultStartTime={startTime}
-            />
-          </div>
-          <div className="mt-2">
-            <SalaryList
-              startDate={startDate}
-              endDate={endDate}
-            />
-          </div>
+    <div>
+      <div className="flex items-center py-2 bg-slate-300">
+        <div className="md:flex-[33%]"></div>
+        <div className="flex-[90%] md:flex-[33%]">
+          <h1 className="text-2xl font-bold text-center text-nowrap">Mesai ve Tazminat Hesaplayıcı</h1>
         </div>
-        <div className="col-span-full">
-          <div className='flex flex-col justify-start items-start text-left'>
-            {selectedDays.length > 0 && (
-              <p className="text-sm">Seçilen çalışma günleri: {selectedDays.map(sd => sd.day.name).join(', ')}</p>
-            )}
-            {startTime && endTime && (
-              <>
-                <p className="text-sm">Seçilen genel mesai saati aralığı : {startTime} - {endTime}</p>
-                {
-                  workingTime && selectedDays.length > 0 && (
-                    <p className="text-sm">Mesai süresi ortalama günlük : {Math.round(Number(((weeklyWorkingTime / selectedDays.length) / 60 / 60)) * 10) / 10} saat</p>
-                  )
-                }
-                {
-                  selectedDays.length > 0 && (
-                    <>
-                      <p className="text-sm">Mesai süresi haftalık : {Math.round(Number((weeklyWorkingTime / 60 / 60)) * 10) / 10} saat</p>
-                      {
-                        weeklyWorkingTime > legalWeeklyWorkingLimit && (
-                          <p className="text-sm text-red-600">{`Haftalık çalışma süresi yasal limitin ${weeklyExtraOvertime} saat üzerinde`}  </p>
-                        )
-                      }
-                    </>
-                  )
-                }
-              </>
-            )}
-            {
-              startDate && endDate && (
-                <p className="text-sm">Seçilen Tarih Aralığı: {startDate.toLocaleDateString('tr-TR', { dateStyle: 'full' })} - {endDate.toLocaleDateString('tr-TR', { dateStyle: 'full' })}</p>
-              )
-            }
-          </div>
+        <div className="flex-[10%] md:flex-[33%] flex justify-center items-center">
+          <a className="" href="https://github.com/mbozkaya/mesai-tazminat-hesaplayici">
+            <img height={36} width={36} src="/mesai-tazminat-hesaplayici/github-mark.png" />
+          </a>
         </div>
       </div>
-      <div className="col-span-full md:col-span-3 px-2 py-1">
-        {startDate && endDate && (
-          <div className="">
-            <div className="p-1 border border-gray-300" >
-              <p className="text-sm mt-2">Toplam gün sayısı: {totalDays} gün</p>
-              <p className="text-sm">Toplam hafta sayısı: {totalWeeks} hafta</p>
-              <p className="text-sm">Hafta içi gün sayısı: {weekdays.length} gün</p>
-              <p className="text-sm">Hafta sonu gün sayısı: {weekends.length} gün</p>
+      <div className="min-h-screen container mx-auto grid grid-cols-12 md:divide-x md:divide-gray-500">
+        <div className="col-span-full md:col-span-9 grid grid-cols-12 max-h-screen overflow-y-auto p-2">
+          <div className="col-span-full">
+            <div className="flex justify-center items-center">
+              <DateRangePicker
+                startDate={startDate}
+                endDate={endDate}
+                onStartDateChange={handleStartDateChange}
+                onEndDateChange={handleEndDateChange}
+                disabled={false}
+              />
             </div>
-            <Ubgt
-              holidays={holidays}
-              relioginalHolidays={relioginalHolidays}
-            />
-            <AnnualLeaveDays />
-            <SeverancePay />
-            {
-              ubgtDates.length > 0 ? (
-                <div className="text-md underline flex justify-between">
-                  UBGT ücreti
-                  {' '}
-                  <span className='text-md font-bold'>{totalUbgtWage.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2, currency: 'try', style: 'currency' })}</span>
-                </div>
-              ) : null
-            }
-            {
-              paidAnnualLeaveDays > 0 ? (
-                <div className="text-md underline flex justify-between">
-                  Yıılık izin alacağı ücreti
-                  {' '}
-                  <span className='text-md font-bold'>{totalPaidAnnualLeaveDayWage.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2, currency: 'try', style: 'currency' })}</span>
-                </div>
-              ) : null
-            }
-
-            {
-              totalExtraOvertimeWage && totalExtraOvertimeWage > 0 ? (
-                <p className="text-md underline flex justify-between">
-                  Ek mesai ücreti
-                  {' '}
-                  <span className='text-md font-bold'>{totalExtraOvertimeWage.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2, currency: 'try', style: 'currency' })}</span>
-                </p>
-              ) : null
-            }
-            {
-              includedSeverancePay ? (
-                <p className="text-md underline flex justify-between">
-                  Kıdem Tazminatı
-                  {' '}
-                  <span className='text-md font-bold'>{severancePayWage.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2, currency: 'try', style: 'currency' })}</span>
-                </p>
-              ) : null
-            }
-            {
-              (includedSeverancePay || totalExtraOvertimeWage > 0 || paidAnnualLeaveDays > 0 || ubgtDates.length > 0) ? (
-                <div className="w-full" >
-                  <span className="block  text-xl font-medium" >+</span>
-                  <span className="block w-full border border-black"></span>
-                  <div className="mt-2 flex justify-between  items-center">
-                    <span className="text-xl font-medium">Toplam</span>
-                    <span className=" text-xl font-medium">
-                      {
-                        (severancePayWage + totalUbgtWage + totalExtraOvertimeWage + totalPaidAnnualLeaveDayWage).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2, currency: 'try', style: 'currency' })
-                      }
-                    </span>
-                  </div>
-                </div>
-              ) : null
-            }
+            <div className="mt-2 flex justify-center items-center">
+              <TimeRangePicker
+                startTime={startTime}
+                endTime={endTime}
+                onStartTimeChange={handleStartTimeChange}
+                onEndTimeChange={handleEndTimeChange}
+                disabled={false}
+              />
+            </div>
+            <div className="mt-2">
+              <DaysOfWeekPicker
+                selectedDays={selectedDays}
+                onDayChange={handleDayChange}
+                defaultWorkingTime={workingTime}
+                defaultEndTime={endTime}
+                defaultStartTime={startTime}
+              />
+            </div>
+            <div className="mt-2">
+              <SalaryList
+                startDate={startDate}
+                endDate={endDate}
+              />
+            </div>
           </div>
-        )}
+          <div className="col-span-full">
+            <div className='flex flex-col justify-start items-start text-left'>
+              {selectedDays.length > 0 && (
+                <p className="text-sm">Seçilen çalışma günleri: {selectedDays.map(sd => sd.day.name).join(', ')}</p>
+              )}
+              {startTime && endTime && (
+                <>
+                  <p className="text-sm">Seçilen genel mesai saati aralığı : {startTime} - {endTime}</p>
+                  {
+                    workingTime && selectedDays.length > 0 && (
+                      <p className="text-sm">Mesai süresi ortalama günlük : {Math.round(Number(((weeklyWorkingTime / selectedDays.length) / 60 / 60)) * 10) / 10} saat</p>
+                    )
+                  }
+                  {
+                    selectedDays.length > 0 && (
+                      <>
+                        <p className="text-sm">Mesai süresi haftalık : {Math.round(Number((weeklyWorkingTime / 60 / 60)) * 10) / 10} saat</p>
+                        {
+                          weeklyWorkingTime > legalWeeklyWorkingLimit && (
+                            <p className="text-sm text-red-600">{`Haftalık çalışma süresi yasal limitin ${weeklyExtraOvertime} saat üzerinde`}  </p>
+                          )
+                        }
+                      </>
+                    )
+                  }
+                </>
+              )}
+              {
+                startDate && endDate && (
+                  <p className="text-sm">Seçilen Tarih Aralığı: {startDate.toLocaleDateString('tr-TR', { dateStyle: 'full' })} - {endDate.toLocaleDateString('tr-TR', { dateStyle: 'full' })}</p>
+                )
+              }
+            </div>
+          </div>
+        </div>
+        <div className="col-span-full md:col-span-3 px-2 py-1">
+          {startDate && endDate && (
+            <div className="">
+              <div className="p-1 border border-gray-300" >
+                <p className="text-sm mt-2">Toplam gün sayısı: {totalDays} gün</p>
+                <p className="text-sm">Toplam hafta sayısı: {totalWeeks} hafta</p>
+                <p className="text-sm">Hafta içi gün sayısı: {weekdays.length} gün</p>
+                <p className="text-sm">Hafta sonu gün sayısı: {weekends.length} gün</p>
+              </div>
+              <Ubgt
+                holidays={holidays}
+                relioginalHolidays={relioginalHolidays}
+              />
+              <AnnualLeaveDays />
+              <SeverancePay />
+              {
+                ubgtDates.length > 0 ? (
+                  <div className="text-md underline flex justify-between">
+                    UBGT ücreti
+                    {' '}
+                    <span className='text-md font-bold'>{totalUbgtWage.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2, currency: 'try', style: 'currency' })}</span>
+                  </div>
+                ) : null
+              }
+              {
+                paidAnnualLeaveDays > 0 ? (
+                  <div className="text-md underline flex justify-between">
+                    Yıılık izin alacağı ücreti
+                    {' '}
+                    <span className='text-md font-bold'>{totalPaidAnnualLeaveDayWage.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2, currency: 'try', style: 'currency' })}</span>
+                  </div>
+                ) : null
+              }
+
+              {
+                totalExtraOvertimeWage && totalExtraOvertimeWage > 0 ? (
+                  <p className="text-md underline flex justify-between">
+                    Ek mesai ücreti
+                    {' '}
+                    <span className='text-md font-bold'>{totalExtraOvertimeWage.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2, currency: 'try', style: 'currency' })}</span>
+                  </p>
+                ) : null
+              }
+              {
+                includedSeverancePay ? (
+                  <p className="text-md underline flex justify-between">
+                    Kıdem Tazminatı
+                    {' '}
+                    <span className='text-md font-bold'>{severancePayWage.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2, currency: 'try', style: 'currency' })}</span>
+                  </p>
+                ) : null
+              }
+              {
+                (includedSeverancePay || totalExtraOvertimeWage > 0 || paidAnnualLeaveDays > 0 || ubgtDates.length > 0) ? (
+                  <div className="w-full" >
+                    <span className="block  text-xl font-medium" >+</span>
+                    <span className="block w-full border border-black"></span>
+                    <div className="mt-2 flex justify-between  items-center">
+                      <span className="text-xl font-medium">Toplam</span>
+                      <span className=" text-xl font-medium">
+                        {
+                          (severancePayWage + totalUbgtWage + totalExtraOvertimeWage + totalPaidAnnualLeaveDayWage).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2, currency: 'try', style: 'currency' })
+                        }
+                      </span>
+                    </div>
+                  </div>
+                ) : null
+              }
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
