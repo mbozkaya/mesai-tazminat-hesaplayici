@@ -158,8 +158,9 @@ function SalaryList({ startDate, endDate }) {
       }
       setSalaries(defaultSalaries);
     };
-
-    searchSalaries();
+    if (startDate && endDate) {
+      searchSalaries();
+    }
 
   }, [startDate, endDate]);
 
