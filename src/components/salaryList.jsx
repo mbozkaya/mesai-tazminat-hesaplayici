@@ -168,7 +168,7 @@ function SalaryList({ startDate, endDate }) {
       <div className="flex justify-start items-center mb-2 gap-2" >
         <label className="text-sm font-medium text-gray-700">Dönemsel Maaş Bilgisi</label>
         <button
-          className="text-sm p-1 rounded-md text-black"
+          className="text-sm px-1 py-0.5 rounded-md text-black bg-gray-200"
           onClick={() => { setShow(!show) }}
         >
           {

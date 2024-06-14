@@ -36,6 +36,7 @@ const DateRangePicker = ({
           maxDate={endDate}
           minDate={minDate}
           disabled={disabled}
+          calendarClassName="ml-10 sm:ml-0"
         />
       </div>
       <div className="flex flex-col">
@@ -56,6 +57,7 @@ const DateRangePicker = ({
           dropdownMode="select"
           maxDate={maxDate}
           disabled={disabled}
+          calendarClassName="mr-10 sm:mr-0"
         />
       </div>
     </div>
